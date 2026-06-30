@@ -55,3 +55,7 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Postgres data (volume mapeado pelo compose)
+postgres-data/
+
