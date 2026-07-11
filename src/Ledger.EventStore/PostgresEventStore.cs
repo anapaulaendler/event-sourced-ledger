@@ -10,6 +10,11 @@ namespace Ledger.EventStore;
 
 public sealed class PostgresEventStore : IEventStore
 {
+    static PostgresEventStore()
+    {
+        DefaultTypeMap.MatchNamesWithUnderscores = true;
+    }
+
     private readonly NpgsqlDataSource _dataSource;
 
     public PostgresEventStore(NpgsqlDataSource dataSource) => _dataSource = dataSource;
@@ -63,9 +68,21 @@ public sealed class PostgresEventStore : IEventStore
         }
     }
 
-    public Task<IReadOnlyList<StoredEvent>> ReadStreamAsync(Guid streamId, CancellationToken ct = default)
-        => throw new NotImplementedException();
+    public async Task<IReadOnlyList<StoredEvent>> ReadStreamAsync(Guid streamId, CancellationToken ct = default)
+    {
+        await using var conn = await _dataSource.OpenConnectionAsync(ct);
 
-    public Task<IReadOnlyList<StoredEvent>> ReadAllAsync(long fromSequence, int max, CancellationToken ct = default)
-        => throw new NotImplementedException();
+        var rows = await conn.QueryAsync<StoredEvent>(new CommandDefinition(SqlQueries.ReadStream, new { stream_id = streamId }, cancellationToken: ct));
+
+        return rows.ToList();
+    }
+
+    public async Task<IReadOnlyList<StoredEvent>> ReadAllAsync(long fromSequence, int max, CancellationToken ct = default)
+    {
+        await using var conn = await _dataSource.OpenConnectionAsync(ct);
+
+        var rows = await conn.QueryAsync<StoredEvent>(new CommandDefinition(SqlQueries.ReadAll, new { from_sequence = fromSequence, max }, cancellationToken: ct));
+
+        return rows.ToList();
+    }
 }
