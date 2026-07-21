@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/Ledger.Api/Ledger.Api.csproj" />
     <Project Path="src/Ledger.Domain/Ledger.Domain.csproj" />
     <Project Path="src/Ledger.EventStore/Ledger.EventStore.csproj" />
   </Folder>
