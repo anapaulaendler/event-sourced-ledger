@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Ledger.Domain\Ledger.Domain.csproj" />
     <ProjectReference Include="..\Ledger.EventStore\Ledger.EventStore.csproj" />
+    <ProjectReference Include="..\Ledger.Idempotency\Ledger.Idempotency.csproj" />
   </ItemGroup>
 
   <ItemGroup>
