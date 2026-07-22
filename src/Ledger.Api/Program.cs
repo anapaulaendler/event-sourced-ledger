@@ -20,6 +20,7 @@ app.UseMiddleware<IdempotencyMiddleware>();
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 app.MapAccountsEndpoints();
+app.MapTransactionsEndpoints();
 
 app.Run();
 
