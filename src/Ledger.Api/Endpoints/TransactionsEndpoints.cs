@@ -46,5 +46,19 @@ public static class TransactionsEndpoints
 
             return Results.Created($"/transactions/{transaction.Id}", new { transactionId = transaction.Id });
         });
+
+        app.MapPost("/transactions/{originalId:guid}/reversal", async (
+            Guid originalId, ReversalRequest req, IEventStore store, CancellationToken ct) =>
+        {
+            var reversalId = Guid.NewGuid();
+            var evt = new TransactionReversed
+            {
+                TransactionId = reversalId,
+                OriginalTransactionId = originalId,
+                Reason = req.Reason
+            };
+            await store.AppendAsync(reversalId, expectedVersion: -1, [evt], ct);
+            return Results.Created($"/transactions/{reversalId}", new { reversalTransactionId = reversalId });
+        });
     }
 }

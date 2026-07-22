@@ -35,6 +35,20 @@ public sealed class TransactionsEndpointsTests : IClassFixture<ApiTestFixture>
     }
 
     [Fact]
+    public async Task Post_Transaction_Reversal_Returns_201()
+    {
+        var originalId = Guid.NewGuid();
+        var req = new HttpRequestMessage(HttpMethod.Post, $"/transactions/{originalId}/reversal")
+        {
+            Content = JsonContent.Create(new ReversalRequest { Reason = "duplicated payment" })
+        };
+        req.Headers.Add("Idempotency-Key", Guid.NewGuid().ToString());
+
+        var response = await _client.SendAsync(req);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Post_Transactions_Unbalanced_Returns_400()
     {
         var req = new HttpRequestMessage(HttpMethod.Post, "/transactions")
