@@ -1,3 +1,4 @@
+using Ledger.Api.Endpoints;
 using Ledger.EventStore;
 using Ledger.EventStore.Interfaces;
 using Ledger.Idempotency;
@@ -18,6 +19,7 @@ app.UseMiddleware<Ledger.Api.GlobalExceptionMiddleware>();
 app.UseMiddleware<IdempotencyMiddleware>();
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
+app.MapAccountsEndpoints();
 
 app.Run();
 
