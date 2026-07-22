@@ -14,6 +14,7 @@ builder.Services.AddTransient<IdempotencyMiddleware>();
 
 var app = builder.Build();
 
+app.UseMiddleware<Ledger.Api.GlobalExceptionMiddleware>();
 app.UseMiddleware<IdempotencyMiddleware>();
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
