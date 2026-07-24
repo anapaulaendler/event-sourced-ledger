@@ -1,10 +1,14 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/Ledger.Api/Ledger.Api.csproj" />
     <Project Path="src/Ledger.Domain/Ledger.Domain.csproj" />
     <Project Path="src/Ledger.EventStore/Ledger.EventStore.csproj" />
+    <Project Path="src/Ledger.Idempotency/Ledger.Idempotency.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Ledger.Api.Tests/Ledger.Api.Tests.csproj" />
     <Project Path="tests/Ledger.Domain.Tests/Ledger.Domain.Tests.csproj" />
     <Project Path="tests/Ledger.EventStore.Tests/Ledger.EventStore.Tests.csproj" />
+    <Project Path="tests/Ledger.Idempotency.Tests/Ledger.Idempotency.Tests.csproj" />
   </Folder>
 </Solution>

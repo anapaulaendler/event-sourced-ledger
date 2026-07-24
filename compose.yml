@@ -16,6 +16,20 @@ services:
       timeout: 5s
       retries: 5
 
+  api:
+    build:
+      context: .
+      dockerfile: src/Ledger.Api/Dockerfile
+    container_name: ledger-api
+    ports:
+      - "8080:8080"
+    environment:
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=ledger;Username=ledger;Password=ledger
+      ASPNETCORE_URLS: http://+:8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   pgadmin:
     image: docker.io/dpage/pgadmin4
     container_name: ledger-pgadmin
