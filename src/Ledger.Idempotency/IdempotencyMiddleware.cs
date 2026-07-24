@@ -7,7 +7,7 @@ namespace Ledger.Idempotency;
 public sealed class IdempotencyMiddleware : IMiddleware
 {
     private const string HEADER_NAME = "Idempotency-Key";
-    private static readonly TimeSpan Ttl = TimeSpan.FromHours(24);
+    private static readonly TimeSpan TimeToLive = TimeSpan.FromHours(24);
 
     private readonly NpgsqlDataSource _dataSource;
 
@@ -106,7 +106,7 @@ public sealed class IdempotencyMiddleware : IMiddleware
                     RequestHash = requestHash,
                     ResponseStatus = context.Response.StatusCode,
                     ResponseBody = string.IsNullOrWhiteSpace(responseText) ? "null" : responseText,
-                    ExpiresAt = DateTime.UtcNow.Add(Ttl)
+                    ExpiresAt = DateTime.UtcNow.Add(TimeToLive)
                 }, context.RequestAborted);
                 await tx.CommitAsync(context.RequestAborted);
             }
