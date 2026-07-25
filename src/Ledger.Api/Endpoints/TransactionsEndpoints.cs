@@ -22,7 +22,6 @@ public static class TransactionsEndpoints
                 })
                 .ToList();
 
-            // ana: por que 400 e não 422 quando unbalanced? escreve a defesa no README/blog.
             var transaction = new Transaction(
                 Guid.NewGuid(),
                 req.OccurredAt,
@@ -47,15 +46,29 @@ public static class TransactionsEndpoints
             return Results.Created($"/transactions/{transaction.Id}", new { transactionId = transaction.Id });
         });
 
-        app.MapPost("/transactions/{originalId:guid}/reversal", async (
-            Guid originalId, ReversalRequest req, IEventStore store, CancellationToken ct) =>
+        app.MapPost("/transactions/{originalId:guid}/reversal", async (Guid originalId, ReversalRequest req, IEventStore store, CancellationToken ct) =>
         {
+            var originalStream = await store.ReadStreamAsync(originalId, ct);
+            
+            var originalPosted = originalStream
+                .Where(e => e.Type == nameof(TransactionPosted))
+                .Select(e => System.Text.Json.JsonSerializer.Deserialize<TransactionPosted>(e.PayloadJson))
+                .FirstOrDefault(p => p is not null);
+
+            if (originalPosted is null)
+                return Results.NotFound(new { message = $"Transaction {originalId} not found" });
+
+            var invertedPostings = originalPosted.Postings
+                .Select(p => new PostingSnapshot(p.AccountId, p.CreditCents, p.DebitCents, p.Currency))
+                .ToList();
+
             var reversalId = Guid.NewGuid();
             var evt = new TransactionReversed
             {
                 TransactionId = reversalId,
                 OriginalTransactionId = originalId,
-                Reason = req.Reason
+                Reason = req.Reason,
+                Postings = invertedPostings
             };
             await store.AppendAsync(reversalId, expectedVersion: -1, [evt], ct);
             return Results.Created($"/transactions/{reversalId}", new { reversalTransactionId = reversalId });

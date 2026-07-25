@@ -6,10 +6,12 @@ using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("Postgres")
-    ?? throw new InvalidOperationException("ConnectionStrings:Postgres not configured");
-
-builder.Services.AddSingleton(_ => NpgsqlDataSource.Create(connectionString));
+builder.Services.AddSingleton(sp =>
+{
+    var connectionString = sp.GetRequiredService<IConfiguration>().GetConnectionString("Postgres")
+        ?? throw new InvalidOperationException("ConnectionStrings:Postgres not configured");
+    return NpgsqlDataSource.Create(connectionString);
+});
 builder.Services.AddScoped<IEventStore, PostgresEventStore>();
 builder.Services.AddTransient<IdempotencyMiddleware>();
 
