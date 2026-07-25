@@ -12,5 +12,6 @@
     <Project Path="tests/Ledger.Domain.Tests/Ledger.Domain.Tests.csproj" />
     <Project Path="tests/Ledger.EventStore.Tests/Ledger.EventStore.Tests.csproj" />
     <Project Path="tests/Ledger.Idempotency.Tests/Ledger.Idempotency.Tests.csproj" />
+    <Project Path="tests/Ledger.Projections.Tests/Ledger.Projections.Tests.csproj" />
   </Folder>
 </Solution>
