@@ -18,7 +18,9 @@ builder.Services.AddScoped<IEventStore, PostgresEventStore>();
 builder.Services.AddScoped<IProjector, BalanceProjector>();
 builder.Services.AddScoped<IProjector, StatementProjector>();
 builder.Services.AddScoped<ProjectionRunner>();
+builder.Services.AddSingleton<ProjectionWakeSignal>();
 
+builder.Services.AddHostedService<NotifyListenerService>();
 builder.Services.AddHostedService<PollingProjectionService>();
 
 var host = builder.Build();

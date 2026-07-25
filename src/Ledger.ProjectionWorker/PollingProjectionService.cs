@@ -5,11 +5,13 @@ public sealed class PollingProjectionService : BackgroundService
     private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(5);
 
     private readonly ProjectionRunner _runner;
+    private readonly ProjectionWakeSignal _wake;
     private readonly ILogger<PollingProjectionService> _logger;
 
-    public PollingProjectionService(ProjectionRunner runner, ILogger<PollingProjectionService> logger)
+    public PollingProjectionService(ProjectionRunner runner, ProjectionWakeSignal wake, ILogger<PollingProjectionService> logger)
     {
         _runner = runner;
+        _wake = wake;
         _logger = logger;
     }
 
@@ -33,7 +35,7 @@ public sealed class PollingProjectionService : BackgroundService
                 _logger.LogError(ex, "Projection cycle failed; will retry after interval");
             }
 
-            await Task.Delay(PollInterval, stoppingToken);
+            await _wake.WaitAsync(PollInterval, stoppingToken);
         }
     }
 }
