@@ -37,14 +37,31 @@ public sealed class TransactionsEndpointsTests : IClassFixture<ApiTestFixture>
     [Fact]
     public async Task Post_Transaction_Reversal_Returns_201()
     {
-        var originalId = Guid.NewGuid();
-        var req = new HttpRequestMessage(HttpMethod.Post, $"/transactions/{originalId}/reversal")
+        var postReq = new HttpRequestMessage(HttpMethod.Post, "/transactions")
+        {
+            Content = JsonContent.Create(new PostTransactionRequest
+            {
+                OccurredAt = DateTimeOffset.UtcNow,
+                Description = "to reverse",
+                Postings = new[]
+                {
+                    new PostingRequest { AccountId = Guid.NewGuid(), Debit = new MoneyRequest { AmountCents = 5000, Currency = "BRL" } },
+                    new PostingRequest { AccountId = Guid.NewGuid(), Credit = new MoneyRequest { AmountCents = 5000, Currency = "BRL" } }
+                }
+            })
+        };
+        postReq.Headers.Add("Idempotency-Key", Guid.NewGuid().ToString());
+        var postResponse = await _client.SendAsync(postReq);
+        var postBody = await postResponse.Content.ReadFromJsonAsync<Dictionary<string, Guid>>();
+        var originalId = postBody!["transactionId"];
+
+        var revReq = new HttpRequestMessage(HttpMethod.Post, $"/transactions/{originalId}/reversal")
         {
             Content = JsonContent.Create(new ReversalRequest { Reason = "duplicated payment" })
         };
-        req.Headers.Add("Idempotency-Key", Guid.NewGuid().ToString());
+        revReq.Headers.Add("Idempotency-Key", Guid.NewGuid().ToString());
 
-        var response = await _client.SendAsync(req);
+        var response = await _client.SendAsync(revReq);
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
