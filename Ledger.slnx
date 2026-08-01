@@ -5,6 +5,7 @@
     <Project Path="src/Ledger.EventStore/Ledger.EventStore.csproj" />
     <Project Path="src/Ledger.Idempotency/Ledger.Idempotency.csproj" />
     <Project Path="src/Ledger.Projections/Ledger.Projections.csproj" />
+    <Project Path="src/Ledger.Outbox/Ledger.Outbox.csproj" />
     <Project Path="src/Ledger.ProjectionWorker/Ledger.ProjectionWorker.csproj" />
   </Folder>
   <Folder Name="/tests/">
