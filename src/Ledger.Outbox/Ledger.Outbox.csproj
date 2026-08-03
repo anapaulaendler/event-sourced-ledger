@@ -17,4 +17,10 @@
     <ProjectReference Include="..\Ledger.EventStore\Ledger.EventStore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Migrations\*.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
