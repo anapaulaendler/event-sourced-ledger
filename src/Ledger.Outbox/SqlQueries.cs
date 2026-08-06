@@ -20,4 +20,14 @@ internal static class SqlQueries
             last_error = NULL
         WHERE sequence = @sequence
         """;
+
+    // ana: por que NOW() + @delay no banco em vez de mandar o timestamp ja calculado pelo dispatcher?
+    public const string MarkFailed = """
+        UPDATE outbox
+        SET attempts = @attempts,
+            state = @state,
+            last_error = @last_error,
+            next_attempt_at = NOW() + @delay
+        WHERE sequence = @sequence
+        """;
 }
