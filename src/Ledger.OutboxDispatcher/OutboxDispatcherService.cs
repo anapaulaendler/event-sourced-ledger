@@ -2,8 +2,10 @@ namespace Ledger.OutboxDispatcher;
 
 public sealed class OutboxDispatcherService(
     OutboxDispatcher dispatcher,
+    OutboxWakeSignal wake,
     ILogger<OutboxDispatcherService> logger) : BackgroundService
 {
+    /// <summary>Rede de seguranca: se o LISTEN cair, o despacho continua neste ritmo.</summary>
     private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(5);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -26,7 +28,7 @@ public sealed class OutboxDispatcherService(
                 logger.LogError(ex, "Dispatch cycle failed; will retry after interval");
             }
 
-            await Task.Delay(PollInterval, stoppingToken);
+            await wake.WaitAsync(PollInterval, stoppingToken);
         }
     }
 }

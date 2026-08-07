@@ -28,6 +28,9 @@ builder.Services.AddSingleton<IOutboxPublisher>(sp =>
 
 // ana: por que tudo singleton aqui, e nao Scoped como no ProjectionWorker?
 builder.Services.AddSingleton<OutboxDispatcher>();
+builder.Services.AddSingleton<OutboxWakeSignal>();
+
+builder.Services.AddHostedService<NotifyListenerService>();
 builder.Services.AddHostedService<OutboxDispatcherService>();
 
 var host = builder.Build();
