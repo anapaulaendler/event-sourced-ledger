@@ -30,6 +30,21 @@ services:
       postgres:
         condition: service_healthy
 
+  outbox-dispatcher:
+    build:
+      context: .
+      dockerfile: src/Ledger.OutboxDispatcher/Dockerfile
+    container_name: ledger-outbox-dispatcher
+    environment:
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=ledger;Username=ledger;Password=ledger
+      Kafka__BootstrapServers: kafka:9092
+      Outbox__Topic: ledger.events
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
   kafka:
     image: docker.io/apache/kafka:3.7.0
     container_name: ledger-kafka
@@ -46,6 +61,11 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,HOST:PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      # ana: por que RF=1 aqui? (default e 3; com 1 broker o __consumer_offsets nunca e criado
+      # e todo consumer group trava, mesmo com o producer funcionando)
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_HEAP_OPTS: -Xmx256m
     healthcheck:
       test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]

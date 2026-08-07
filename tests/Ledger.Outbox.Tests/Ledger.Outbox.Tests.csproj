@@ -26,6 +26,7 @@
     <ProjectReference Include="..\..\src\Ledger.Domain\Ledger.Domain.csproj" />
     <ProjectReference Include="..\..\src\Ledger.EventStore\Ledger.EventStore.csproj" />
     <ProjectReference Include="..\..\src\Ledger.Outbox\Ledger.Outbox.csproj" />
+    <ProjectReference Include="..\..\src\Ledger.OutboxDispatcher\Ledger.OutboxDispatcher.csproj" />
   </ItemGroup>
 
 </Project>
