@@ -60,6 +60,7 @@ public sealed class KafkaPublisherTests(KafkaFixture fixture)
     public async Task Events_Of_Same_Aggregate_Keep_Order_On_One_Partition()
     {
         var topic = NewTopic();
+        await fixture.CreateTopicAsync(topic, partitions: 3);
         var aggregateId = Guid.NewGuid();
 
         using var producer = fixture.CreateProducer();

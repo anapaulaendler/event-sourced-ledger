@@ -47,11 +47,34 @@ public sealed class NotifyListenerTests(DispatcherFixture fixture)
         Assert.False(woke);
     }
 
-    /// <summary>Varios eventos em rajada nao enfileiram varios ciclos — um sinal basta.</summary>
+    /// <summary>
+    /// Coalescencia: N sinais sem leitor no meio viram 1 token, nao N.
+    /// Sem banco de proposito — a propriedade e do canal, e testa-la via NOTIFY seria racy
+    /// (notificacoes que chegam DEPOIS da primeira leitura acordam de novo, e isso e correto).
+    /// </summary>
     [Fact]
-    public async Task Burst_Of_Events_Coalesces_Into_A_Single_Wake()
+    public async Task Ten_Signals_Without_A_Reader_Collapse_Into_One()
+    {
+        var wake = new OutboxWakeSignal();
+
+        for (var i = 0; i < 10; i++)
+        {
+            wake.Signal();
+        }
+
+        Assert.True(await wake.WaitAsync(TimeSpan.FromMilliseconds(300), CancellationToken.None));
+        Assert.False(await wake.WaitAsync(TimeSpan.FromMilliseconds(300), CancellationToken.None));
+    }
+
+    /// <summary>
+    /// A propriedade que a coalescencia precisa preservar: descartar sinais nao pode
+    /// descartar trabalho. Um unico wake tem que levar o dispatcher a drenar a rajada inteira.
+    /// </summary>
+    [Fact]
+    public async Task A_Single_Wake_Drains_The_Whole_Burst()
     {
         await fixture.ResetAsync();
+        var topic = $"ledger.burst.{Guid.NewGuid():N}";
 
         var wake = new OutboxWakeSignal();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
@@ -60,20 +83,21 @@ public sealed class NotifyListenerTests(DispatcherFixture fixture)
         await listener.StartAsync(cts.Token);
         await WaitForListenerAsync();
 
-        for (var i = 0; i < 10; i++)
+        const int BURST = 10;
+        for (var i = 0; i < BURST; i++)
         {
             await fixture.AppendRawEventAsync(Guid.NewGuid(), 1, "TransactionPosted", "{}");
         }
 
         Assert.True(await wake.WaitAsync(TimeSpan.FromSeconds(10), cts.Token));
 
-        // O canal tem capacidade 1: as outras 9 notificacoes foram descartadas, nao acumuladas.
-        await Task.Delay(500, cts.Token);
-        var secondWake = await wake.WaitAsync(TimeSpan.FromMilliseconds(300), cts.Token);
+        var dispatcher = fixture.CreateDispatcher(topic);
+        while (await dispatcher.RunOnceAsync(cts.Token)) { }
 
         await listener.StopAsync(CancellationToken.None);
 
-        Assert.False(secondWake);
+        Assert.Equal(BURST, await fixture.CountByStateAsync("sent"));
+        Assert.Equal(0, await fixture.CountByStateAsync("pending"));
     }
 
     [Fact]

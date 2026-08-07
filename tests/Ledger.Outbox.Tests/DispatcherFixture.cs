@@ -1,4 +1,5 @@
 using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Dapper;
 using Ledger.Outbox.Interfaces;
 using Ledger.OutboxDispatcher;
@@ -45,6 +46,16 @@ public sealed class DispatcherFixture : IAsyncLifetime
             await using var cmd = new NpgsqlCommand(await File.ReadAllTextAsync(path), conn);
             await cmd.ExecuteNonQueryAsync();
         }
+    }
+
+    /// <summary>
+    /// Cria o topico com varias particoes de proposito: com o default de 1 particao,
+    /// qualquer asserção de "mesma key -> mesma particao" passa por vacuidade.
+    /// </summary>
+    public async Task CreateTopicAsync(string topic, int partitions = 3)
+    {
+        using var admin = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = BootstrapServers }).Build();
+        await admin.CreateTopicsAsync([new TopicSpecification { Name = topic, NumPartitions = partitions, ReplicationFactor = 1 }]);
     }
 
     public OutboxDispatcher.OutboxDispatcher CreateDispatcher(string topic) =>

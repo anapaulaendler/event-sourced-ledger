@@ -1,4 +1,5 @@
 using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Testcontainers.Kafka;
 
 namespace Ledger.Outbox.Tests;
@@ -18,6 +19,16 @@ public sealed class KafkaFixture : IAsyncLifetime
     }
 
     public IProducer<string, string> CreateProducer() => KafkaProducerFactory.Create(BootstrapServers);
+
+    /// <summary>
+    /// Cria o topico com varias particoes de proposito: com o default de 1 particao,
+    /// qualquer asserção de "mesma key -> mesma particao" passa por vacuidade.
+    /// </summary>
+    public async Task CreateTopicAsync(string topic, int partitions = 3)
+    {
+        using var admin = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = BootstrapServers }).Build();
+        await admin.CreateTopicsAsync([new TopicSpecification { Name = topic, NumPartitions = partitions, ReplicationFactor = 1 }]);
+    }
 
     /// <summary>
     /// Consumer de teste: le do inicio do topico e para quando o proximo poll estoura o timeout.
