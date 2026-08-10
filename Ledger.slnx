@@ -5,6 +5,8 @@
     <Project Path="src/Ledger.EventStore/Ledger.EventStore.csproj" />
     <Project Path="src/Ledger.Idempotency/Ledger.Idempotency.csproj" />
     <Project Path="src/Ledger.Projections/Ledger.Projections.csproj" />
+    <Project Path="src/Ledger.Outbox/Ledger.Outbox.csproj" />
+    <Project Path="src/Ledger.OutboxDispatcher/Ledger.OutboxDispatcher.csproj" />
     <Project Path="src/Ledger.ProjectionWorker/Ledger.ProjectionWorker.csproj" />
   </Folder>
   <Folder Name="/tests/">
@@ -12,6 +14,7 @@
     <Project Path="tests/Ledger.Domain.Tests/Ledger.Domain.Tests.csproj" />
     <Project Path="tests/Ledger.EventStore.Tests/Ledger.EventStore.Tests.csproj" />
     <Project Path="tests/Ledger.Idempotency.Tests/Ledger.Idempotency.Tests.csproj" />
+    <Project Path="tests/Ledger.Outbox.Tests/Ledger.Outbox.Tests.csproj" />
     <Project Path="tests/Ledger.Projections.Tests/Ledger.Projections.Tests.csproj" />
   </Folder>
 </Solution>
