@@ -63,6 +63,9 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       # ana: por que RF=1 aqui? (default e 3; com 1 broker o __consumer_offsets nunca e criado
       # e todo consumer group trava, mesmo com o producer funcionando)
+      # ana: por que keyar por aggregate_id ja com 1 particao? (subir de 1 para N vira config;
+      # nao keyar e depois particionar quebra a ordem por stream de forma irreversivel)
+      KAFKA_NUM_PARTITIONS: 3
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
