@@ -26,8 +26,6 @@ public sealed class IdempotencyStoreTests : IAsyncLifetime
         await using var conn = await _dataSource.OpenConnectionAsync();
         await using var cmd = new NpgsqlCommand(migrationSql, conn);
         await cmd.ExecuteNonQueryAsync();
-
-        DefaultTypeMap.MatchNamesWithUnderscores = true;
     }
 
     public async Task DisposeAsync()
