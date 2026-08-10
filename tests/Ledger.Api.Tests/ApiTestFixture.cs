@@ -27,7 +27,11 @@ public sealed class ApiTestFixture : WebApplicationFactory<Program>, IAsyncLifet
         foreach (var path in new[]
         {
             "../../../../../src/Ledger.EventStore/Migrations/001_CreateEventsTable.sql",
-            "../../../../../src/Ledger.Idempotency/Migrations/002_CreateIdempotencyTable.sql"
+            "../../../../../src/Ledger.Idempotency/Migrations/002_CreateIdempotencyTable.sql",
+            "../../../../../src/Ledger.Projections/Migrations/003_CreateBalancesTable.sql",
+            "../../../../../src/Ledger.Projections/Migrations/004_CreateStatementTable.sql",
+            "../../../../../src/Ledger.Projections/Migrations/005_CreateCheckpointsTable.sql",
+            "../../../../../src/Ledger.EventStore/Migrations/006_CreateEventsNotifyTrigger.sql"
         })
         {
             var sql = await File.ReadAllTextAsync(path);

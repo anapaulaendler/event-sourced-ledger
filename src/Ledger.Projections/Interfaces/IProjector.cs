@@ -7,5 +7,5 @@ public interface IProjector
 {
     string Name { get; }
 
-    Task ApplyAsync(StoredEvent evt, NpgsqlConnection conn, NpgsqlTransaction tx, CancellationToken ct);
+    Task ApplyAsync(StoredEvent @event, NpgsqlConnection conn, NpgsqlTransaction tx, CancellationToken ct);
 }

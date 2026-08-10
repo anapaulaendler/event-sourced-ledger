@@ -24,6 +24,7 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 app.MapAccountsEndpoints();
 app.MapTransactionsEndpoints();
 app.MapAuditEndpoints();
+app.MapProjectionsEndpoints();
 
 app.Run();
 
